@@ -1,8 +1,14 @@
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/fetcher');
+// import bluebird for promisification
+var Promise = require("bluebird");
+Promise.promisifyAll(require("mongoose"));
 
+// define connection
+mongoose.connect('mongodb://localhost/fetcher', {useNewUrlParser: true, useUnifiedTopology: true});
+// const db = mongoose.connection;
+
+// define schema
 let repoSchema = mongoose.Schema({
-  // TODO: your schema here!
   username: String,
   url: String,
   forks: Number
@@ -10,22 +16,28 @@ let repoSchema = mongoose.Schema({
 
 let Repo = mongoose.model('Repo', repoSchema);
 
-let save = (req, res, next) => {
-  // TODO: Your code here
-  // This function should save a repo or repos to
-  // the MongoDB
-  Repo.updateOne({username: req.owner.login, url: req.html_url, forks: req.forks});
+repoSchema.methods.save = (req, res) => {
+  // This function should save a repo/repos to the MongoDB
+  // call Repo.create() with req values
+  // return Repo.find();
 
-  next();
+  // req.data returns an array of obj
+  req.data.forEach(repo => {
+    // account for duplicates!
+    Repo.create({ username: repo.owner.login, url: repo.html_url, forks: repo.forks_count })
+      .catch(err => console.error(err));
+  })
 }
 
-let getAll = (req, res, next) => {
-  Repo.find({})
-    .then(repos => {
-      res.json(repos);
-    })
-  next();
-}
+// repoSchema.methods.find = () => {
+//   Repo.find({})
+//     .then(data => {
+//       console.log('find data ', data)
+//       return data;
+//     })
+//     .catch(err => console.error(err));
+// }
 
-module.exports.save = save;
-module.exports.getAll = getAll;
+// how to refactor into one export?
+module.exports.save = repoSchema.methods.save;
+module.exports.Repo = Repo;
