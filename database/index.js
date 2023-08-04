@@ -25,7 +25,7 @@ repoSchema.methods.save = (req, res) => {
   // This function should save a repo/repos to the MongoDB
   // call Repo.create() with req values
   // return Repo.find();
-  console.log(req.data);
+  // console.log(req.data);
   // req.data returns an array of obj
   req.data.forEach(repo => {
     // account for duplicates!

@@ -1,10 +1,9 @@
 const express = require('express');
 const path = require('path');
+const bodyParser = require('body-parser');
 let app = express();
-var bodyParser = require('body-parser');
-
-let db = require('../database/index');
-let github = require('../helpers/github');
+const {Repo, save} = require('../database/index');
+const {getReposByUsername} = require('../helpers/github');
 
 // TODO - your code here!
 // Set up static file service for files in the `client/dist` directory.
@@ -20,17 +19,13 @@ app.use(bodyParser.json());
 app.post('/repos', function (req, res) {
   // GET from API -> getReposByUsername
   // save to DB -> save/index.js
-
   // let username = req.body;
-  // console.log('25 username in app.post, ', username);
   // pass this info into getRepos
 
-  github.getReposByUsername(req, res)
+  getReposByUsername(req, res)
     .then(response => {
-      // console.log('29 getReposByUser data,', response);
-      // dont forget return statement
       // pass appropriate info to save
-      db.save(response);
+      save(response);
       res.end();
     })
     .catch(err => {
@@ -41,7 +36,7 @@ app.post('/repos', function (req, res) {
 app.get('/repos', function (req, res) {
   // TODO - your code here!
   // This route should send back the top 25 repos
-  db.Repo.find({}).sort({forks: 'desc'})
+  Repo.find({}).sort({forks: 'desc'}).limit(25)
     .then(data => {
       // sort by forks!
       // console.log('get success', data);
