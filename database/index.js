@@ -10,7 +10,11 @@ mongoose.connect('mongodb://localhost/fetcher', {useNewUrlParser: true, useUnifi
 // define schema
 let repoSchema = mongoose.Schema({
   username: String,
-  url: String,
+  // add unique true
+  url: {
+    type: String,
+    unique: true
+  },
   forks: Number
 });
 
@@ -20,23 +24,15 @@ repoSchema.methods.save = (req, res) => {
   // This function should save a repo/repos to the MongoDB
   // call Repo.create() with req values
   // return Repo.find();
-
+  console.log(req.data);
   // req.data returns an array of obj
   req.data.forEach(repo => {
     // account for duplicates!
     Repo.create({ username: repo.owner.login, url: repo.html_url, forks: repo.forks_count })
+      // .then(() => Repo.find({}))
       .catch(err => console.error(err));
   })
 }
-
-// repoSchema.methods.find = () => {
-//   Repo.find({})
-//     .then(data => {
-//       console.log('find data ', data)
-//       return data;
-//     })
-//     .catch(err => console.error(err));
-// }
 
 // how to refactor into one export?
 module.exports.save = repoSchema.methods.save;

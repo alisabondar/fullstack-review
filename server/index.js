@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 let app = express();
+var bodyParser = require('body-parser');
 
 let db = require('../database/index');
 let github = require('../helpers/github');
@@ -13,7 +14,7 @@ let github = require('../helpers/github');
 // runs before EVERYTHING - establishes HOST
 app.use(express.static(path.join(__dirname, '../client/dist')));
 // parse JSON bodies
-app.use(express.json());
+app.use(bodyParser.json());
 
 // routes between client and server
 app.post('/repos', function (req, res) {
@@ -31,7 +32,6 @@ app.post('/repos', function (req, res) {
       // pass appropriate info to save
       return db.save(response);
     })
-    .then(result => console.log(result))
     .catch(err => {
       console.error(err);
     })
@@ -43,7 +43,7 @@ app.get('/repos', function (req, res) {
   db.Repo.find({})
     .then(data => {
       // sort by forks!
-      console.log('get success', data);
+      // console.log('get success', data);
       res.json(data);
     })
     .catch(err => {
