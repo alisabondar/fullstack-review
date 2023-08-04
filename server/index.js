@@ -30,7 +30,8 @@ app.post('/repos', function (req, res) {
       // console.log('29 getReposByUser data,', response);
       // dont forget return statement
       // pass appropriate info to save
-      return db.save(response);
+      db.save(response);
+      res.end();
     })
     .catch(err => {
       console.error(err);
@@ -40,7 +41,7 @@ app.post('/repos', function (req, res) {
 app.get('/repos', function (req, res) {
   // TODO - your code here!
   // This route should send back the top 25 repos
-  db.Repo.find({})
+  db.Repo.find({}).sort({forks: 'desc'})
     .then(data => {
       // sort by forks!
       // console.log('get success', data);

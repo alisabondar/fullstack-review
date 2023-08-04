@@ -10,6 +10,7 @@ mongoose.connect('mongodb://localhost/fetcher', {useNewUrlParser: true, useUnifi
 // define schema
 let repoSchema = mongoose.Schema({
   username: String,
+  repoName: String,
   // add unique true
   url: {
     type: String,
@@ -28,7 +29,7 @@ repoSchema.methods.save = (req, res) => {
   // req.data returns an array of obj
   req.data.forEach(repo => {
     // account for duplicates!
-    Repo.create({ username: repo.owner.login, url: repo.html_url, forks: repo.forks_count })
+    Repo.create({ username: repo.owner.login, repoName: repo.name, url: repo.html_url, forks: repo.forks_count })
       // .then(() => Repo.find({}))
       .catch(err => console.error(err));
   })

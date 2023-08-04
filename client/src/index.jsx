@@ -19,24 +19,29 @@ const App = () => {
   let fetch = () => {
     axios.get('/repos')
       .then(data => {
-        console.log('data fetched', data);
+        // console.log('data fetched', data);
+        // sort data IN DATABASE
         setRepos(data);
       })
       .catch(err => console.log('Cannot fetch repos', err))
   }
 
-  // post into db and rerender..?
+  // post into db and rerender!!!
   const search = (term) => {
     console.log(`${term} was searched`);
     axios.post('/repos', { data: term })
+    // update db and FETCH
+      .then(() => fetch())
       .catch(err => console.error(err));
   }
+
+  let length = (data) => 0;
 
   return (
     <div>
       <h1>Github Fetcher</h1>
-      <Search onSearch={search}/>
-      {/* <p>There are {length()} repos.</p> */}
+      <Search onSearch={search} fetch={fetch}/>
+      <p>There are {length(repos)} repos.</p>
       <RepoList repos={repos}/>
     </div>
   );
